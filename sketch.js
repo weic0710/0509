@@ -48,6 +48,50 @@ function draw() {
           noStroke();
           circle(keypoint.x, keypoint.y, 16);
         }
+
+        // Draw lines connecting specific keypoints
+        stroke(0);
+        strokeWeight(2);
+
+        // Connect keypoints 0 to 4
+        for (let i = 0; i < 4; i++) {
+          line(
+            hand.keypoints[i].x, hand.keypoints[i].y,
+            hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
+          );
+        }
+
+        // Connect keypoints 5 to 8
+        for (let i = 5; i < 8; i++) {
+          line(
+            hand.keypoints[i].x, hand.keypoints[i].y,
+            hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
+          );
+        }
+
+        // Connect keypoints 9 to 12
+        for (let i = 9; i < 12; i++) {
+          line(
+            hand.keypoints[i].x, hand.keypoints[i].y,
+            hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
+          );
+        }
+
+        // Connect keypoints 13 to 16
+        for (let i = 13; i < 16; i++) {
+          line(
+            hand.keypoints[i].x, hand.keypoints[i].y,
+            hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
+          );
+        }
+
+        // Connect keypoints 16 to 20
+        for (let i = 16; i < 20; i++) {
+          line(
+            hand.keypoints[i].x, hand.keypoints[i].y,
+            hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
+          );
+        }
       }
     }
   }
