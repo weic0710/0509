@@ -4,6 +4,14 @@
 let video;
 let handPose;
 let hands = [];
+let circleX = 320; // 圓形初始位置 X
+let circleY = 240; // 圓形初始位置 Y
+let circleSize = 100; // 圓形大小
+let isDragging = false; // 用於追蹤是否正在拖動圓
+let previousX, previousY; // 儲存圓心的前一個位置
+let isDraggingLeft = false; // 用於追蹤左手是否正在拖動圓
+let paths = []; // 儲存所有畫過的軌跡
+let circleColor = [0, 255, 0]; // 初始圓形顏色為綠色
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -29,6 +37,18 @@ function setup() {
 
 function draw() {
   image(video, 0, 0);
+
+  // 繪製所有已畫過的軌跡
+  strokeWeight(10);
+  for (let path of paths) {
+    stroke(path.color);
+    line(path.x1, path.y1, path.x2, path.y2);
+  }
+
+  // 繪製圓形
+  fill(circleColor);
+  noStroke();
+  circle(circleX, circleY, circleSize);
 
   // Ensure at least one hand is detected
   if (hands.length > 0) {
@@ -92,7 +112,74 @@ function draw() {
             hand.keypoints[i + 1].x, hand.keypoints[i + 1].y
           );
         }
+
+        // 檢查左手是否夾住圓形
+        if (hand.handedness === "Left") {
+          let fingertip = hand.keypoints[8];
+          let thumbtip = hand.keypoints[4];
+          let d1 = dist(fingertip.x, fingertip.y, circleX, circleY);
+          let d2 = dist(thumbtip.x, thumbtip.y, circleX, circleY);
+
+          if (d1 < circleSize / 2 && d2 < circleSize / 2) {
+            // 更新圓形位置為食指與大拇指的中間位置
+            let newX = (fingertip.x + thumbtip.x) / 2;
+            let newY = (fingertip.y + thumbtip.y) / 2;
+
+            // 如果正在拖動，記錄軌跡
+            if (isDraggingLeft) {
+              paths.push({
+                x1: circleX,
+                y1: circleY,
+                x2: newX,
+                y2: newY,
+                color: [0, 255, 0], // 綠色
+              });
+              circleColor = [0, 255, 0]; // 更新圓形顏色為綠色
+            }
+
+            circleX = newX;
+            circleY = newY;
+            isDraggingLeft = true; // 開始畫軌跡
+          } else {
+            isDraggingLeft = false; // 停止畫軌跡
+          }
+        }
+
+        // 檢查右手是否夾住圓形 (假設右手畫紅色線條)
+        if (hand.handedness === "Right") {
+          let fingertip = hand.keypoints[8];
+          let thumbtip = hand.keypoints[4];
+          let d1 = dist(fingertip.x, fingertip.y, circleX, circleY);
+          let d2 = dist(thumbtip.x, thumbtip.y, circleX, circleY);
+
+          if (d1 < circleSize / 2 && d2 < circleSize / 2) {
+            // 更新圓形位置為食指與大拇指的中間位置
+            let newX = (fingertip.x + thumbtip.x) / 2;
+            let newY = (fingertip.y + thumbtip.y) / 2;
+
+            // 如果正在拖動，記錄軌跡
+            if (isDragging) {
+              paths.push({
+                x1: circleX,
+                y1: circleY,
+                x2: newX,
+                y2: newY,
+                color: [255, 0, 0], // 紅色
+              });
+              circleColor = [255, 0, 0]; // 更新圓形顏色為紅色
+            }
+
+            circleX = newX;
+            circleY = newY;
+            isDragging = true; // 開始畫軌跡
+          } else {
+            isDragging = false; // 停止畫軌跡
+          }
+        }
       }
     }
+  } else {
+    isDraggingLeft = false; // 停止畫軌跡
+    isDragging = false; // 停止畫軌跡
   }
 }
